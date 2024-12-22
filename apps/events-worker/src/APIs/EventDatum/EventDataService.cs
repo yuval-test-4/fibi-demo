@@ -1,4 +1,6 @@
 using EventsWorker.Infrastructure;
+using EventsWorker.Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventsWorker.APIs;
 

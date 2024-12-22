@@ -42,4 +42,6 @@ public interface IEventDataService
     /// Get a group record for EventData
     /// </summary>
     public Task<Group> GetGroup(EventDatumWhereUniqueInput uniqueId);
+
+    public Task HandleEventData(string message, string? group);
 }

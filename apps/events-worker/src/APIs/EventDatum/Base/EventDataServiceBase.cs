@@ -162,4 +162,37 @@ public abstract class EventDataServiceBase : IEventDataService
         }
         return eventDatum.Group.ToDto();
     }
+
+    public async Task HandleEventData(string message, string? group)
+    {
+        var eventDatum = new EventDatumDbModel
+        {
+            Id = Guid.NewGuid().ToString(),
+            Message = message,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        if (group != null)
+        {
+            eventDatum.Group = await _context
+                .Groups.Where(g => group == g.Name)
+                .FirstOrDefaultAsync();
+        }
+
+        //create group if not found
+        if (eventDatum.Group == null)
+        {
+            eventDatum.Group = new GroupDbModel
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = group,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+        }
+
+        _context.EventData.Add(eventDatum);
+        await _context.SaveChangesAsync();
+    }
 }

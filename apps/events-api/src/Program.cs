@@ -1,6 +1,7 @@
 using System.Reflection;
 using EventsApi;
 using EventsApi.APIs;
+using EventsApi.Brokers.Mymessagebroker;
 using EventsApi.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,7 @@ builder.Services.AddDbContext<EventsApiDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 builder.Services.AddApiAuthentication();
+builder.AddMymessagebroker();
 var app = builder.Build();
 
 app.UseCors();

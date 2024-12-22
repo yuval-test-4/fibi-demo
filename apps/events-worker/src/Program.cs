@@ -28,10 +28,10 @@ builder.Services.AddCors(builder =>
         }
     );
 });
-builder.AddMymessagebroker();
 builder.Services.AddDbContext<EventsWorkerDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+builder.AddMymessagebroker();
 var app = builder.Build();
 
 app.UseCors();

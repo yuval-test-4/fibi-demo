@@ -15,7 +15,7 @@ public abstract class EventsControllerBase : ControllerBase
         _service = service;
     }
 
-    [HttpPost("{Id}/create-event")]
+    [HttpPost("")]
     public async Task<string> CreateEvent([FromBody()] EventCreateInput eventCreateInputDto)
     {
         return await _service.CreateEvent(eventCreateInputDto);

@@ -8,14 +8,19 @@ services:
     environment:
       ASPNETCORE_HTTP_PORTS: 8080
       ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__DbContext: Host=db:5432;Username=admin;Password=admin;Database=postgres
       KAFKA_BROKERS: kafka:9092
       KAFKA_ENABLE_SSL: ${KAFKA_ENABLE_SSL}
       KAFKA_CLIENT_ID: ${KAFKA_CLIENT_ID}
       KAFKA_GROUP_ID: ${KAFKA_GROUP_ID}
+      ConnectionStrings__DbContext: Data Source=db,1433;Initial
+        Catalog=my-service-db;User
+        Id=sa;Password=SqlAdminChangeMe1234!;TrustServerCertificate=true;
     restart: on-failure
     profiles:
       - complete
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
   migrate:
     build:
       context: ./src
@@ -25,24 +30,8 @@ services:
       db:
         condition: service_healthy
     environment:
-      MIGRATION_CONNECTION: Host=db:5432;Username=admin;Password=admin;Database=postgres
-  db:
-    image: postgres:15
-    restart: unless-stopped
-    ports:
-      - 5432:5432
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
-      timeout: 5s
-      interval: 10s
-      retries: 10
-      start_period: 10s
+      MIGRATION_CONNECTION: Data Source=db,1433;Initial Catalog=my-service-db;User
+        Id=sa;Password=SqlAdminChangeMe1234!;TrustServerCertificate=true;
   zookeeper:
     image: confluentinc/cp-zookeeper:5.2.4
     environment:
@@ -79,5 +68,32 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
       KAFKA_CLUSTERS_0_JMXPORT: 9997
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    ports:
+      - 1433:1433
+    environment:
+      MSSQL_SA_PASSWORD: SqlAdminChangeMe1234!
+      ACCEPT_EULA: Y
+    healthcheck:
+      test:
+        - CMD
+        - /opt/mssql-tools/bin/sqlcmd
+        - -S
+        - localhost
+        - -U
+        - sa
+        - -P
+        - SqlAdminChangeMe1234!
+        - -Q
+        - SELECT 1
+        - -b
+        - -o
+        - /dev/null
+      timeout: 5s
+      interval: 10s
+      retries: 10
+      start_period: 10s
 volumes:
-  postgres: ~
+  mssql: ~

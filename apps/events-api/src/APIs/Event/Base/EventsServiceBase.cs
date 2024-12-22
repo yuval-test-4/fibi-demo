@@ -14,7 +14,7 @@ public abstract class EventsServiceBase : IEventsService
         _context = context;
     }
 
-    public async Task<string> CreateEvent(EventCreateInput eventCreateInputDto)
+    public virtual async Task<string> CreateEvent(EventCreateInput eventCreateInputDto)
     {
         throw new NotImplementedException();
     }
